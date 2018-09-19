@@ -10,10 +10,13 @@ NUMBER_TO_ANALYZE = 10000
 MESSAGE_THRESHOLD = 1000
 
 def get_json_data(chat):
-    json_location = CURRENT_DIRECTORY + "/messages/" + chat + "/message.json"
-    with open(json_location) as json_file:
-        json_data = json.load(json_file)
-        return json_data
+    try:
+        json_location = CURRENT_DIRECTORY + "/messages/" + chat + "/message.json"
+        with open(json_location) as json_file:
+            json_data = json.load(json_file)
+            return json_data
+    except IOError:
+        pass # some things the directory aren't messages (DS_Store, stickers_used, etc.)
 
 chats = os.listdir(CURRENT_DIRECTORY + "/messages")[:NUMBER_TO_ANALYZE]
 sorted_chats = []
@@ -25,11 +28,9 @@ invalid_message_count = 0
 print('Analyzing ' + str(min(NUMBER_TO_ANALYZE, len(chats))) + ' chats...')
 
 for chat in chats:
-    if chat != "stickers_used":
-        json_data = get_json_data(chat)
-        messages = json_data["messages"]
-        if len(messages) >= MESSAGE_THRESHOLD:
-            sorted_chats.append((len(messages), chat, messages))
+    json_data = get_json_data(chat)
+    if json_data != None and len(messages) >= MESSAGE_THRESHOLD:
+        sorted_chats.append((len(messages), chat, json_data["messages"]))
 
 sorted_chats.sort(reverse=True)
 
