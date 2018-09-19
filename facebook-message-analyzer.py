@@ -1,4 +1,3 @@
-import csv
 import os
 import json
 import numpy as np
@@ -7,7 +6,7 @@ import datetime
 
 CURRENT_DIRECTORY = os.getcwd()
 NUMBER_TO_ANALYZE = 10000
-MESSAGE_THRESHOLD = 1000
+MESSAGE_THRESHOLD = 100
 
 def get_json_data(chat):
     try:
@@ -29,8 +28,10 @@ print('Analyzing ' + str(min(NUMBER_TO_ANALYZE, len(chats))) + ' chats...')
 
 for chat in chats:
     json_data = get_json_data(chat)
-    if json_data != None and len(messages) >= MESSAGE_THRESHOLD:
-        sorted_chats.append((len(messages), chat, json_data["messages"]))
+    if json_data != None:
+        messages = json_data["messages"]
+        if len(messages) >= MESSAGE_THRESHOLD:
+            sorted_chats.append((len(messages), chat, messages))
 
 sorted_chats.sort(reverse=True)
 
@@ -86,9 +87,9 @@ def plot_histogram_time(chat_number):
     for i , person in enumerate(person_to_times):
         plotted_data = person_to_times[person]
         pl.hist(plotted_data, 100, alpha=0.3, label=person, facecolor=colors[i % len(colors)])
-    pl.tight_layout()
     pl.legend()
     pl.xticks(rotation=90)
+    pl.tight_layout()
     pl.show()
 
 def plot_histogram_words(chat_number):
@@ -102,3 +103,10 @@ def plot_histogram_words(chat_number):
     pl.title('Average Word Count')
     pl.tight_layout()
     pl.show()
+
+def plot(chat_number):
+    plot_num_messages(chat_number)
+    plot_histogram_time(chat_number)
+    plot_histogram_words(chat_number)
+
+plot(4)
