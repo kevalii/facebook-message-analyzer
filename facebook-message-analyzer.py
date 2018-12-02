@@ -103,6 +103,42 @@ def plot_histogram_words(chat_number):
     pl.title('Average Word Count')
     pl.tight_layout()
     pl.show()
+    
+# Number of messages by time of day    
+def plot_histogram_hour(chat_number):
+    time_data = final_data_times[chat_number]
+    pl.xlabel('Hour')
+    pl.ylabel('Number of Messages')
+    pl.title('Messages by Hour')
+    for person in time_data:
+        message_hours = list()
+        for message in time_data[person]:
+            message_hours.append(message.hour)
+        pl.hist(message_hours, 100, alpha=0.5, width=0.5, label=person)
+    pl.xticks(np.arange(24), [f"{i % 12} PM" if i > 12 else "12 PM" if i == 12 else "12 AM" if i == 0 else f"{i % 12} AM" for i in range(24)], rotation = 90)
+    pl.legend()
+    pl.show()
+    
+# Lists most active conversations
+def list_active_chats():
+    data = dict()
+    for chat in final_data_words:
+        total_words = 0
+        a = dict()
+        for person in final_data_words[chat]:
+            num_words = np.sum(final_data_words[chat][person])
+            a.update({person: num_words})
+            total_words += num_words
+        for person in final_data_words[chat]:
+            num_words = np.sum(final_data_words[chat][person])
+            a[person] = '{:.2%} of all words'.format(num_words / total_words)
+        a['total'] = f"{total_words} words"
+        data[chat] = a
+    print("Most active to least active conversations")
+    for chat, stats in data.items():
+        print("########")
+        for label, num in stats.items():
+            print(f'{label}: {num}')
 
 def plot(chat_number):
     plot_num_messages(chat_number)
